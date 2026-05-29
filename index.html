@@ -137,7 +137,7 @@
   .prog-step::after {
     content: '';
     position: absolute;
-    top: 12px;
+    top: 15px;
     left: 50%;
     width: 100%;
     height: 1px;
@@ -148,7 +148,7 @@
   .prog-step::before {
     content: '';
     position: absolute;
-    top: 12px;
+    top: 15px;
     right: 50%;
     width: 50%;
     height: 1px;
@@ -159,15 +159,15 @@
   .prog-step.done::before { opacity: 1; }
 
   .prog-dot {
-    width: 24px;
-    height: 24px;
+    width: 31px;
+    height: 31px;
     border-radius: 0;
     border: 1px solid var(--border);
     background: var(--bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--white-soft);
     z-index: 1;
@@ -179,7 +179,7 @@
     border-color: var(--orange);
     color: var(--white);
   }
-  .prog-step.done .prog-dot::after { content: '✓'; font-size: 11px; }
+  .prog-step.done .prog-dot::after { content: '✓'; font-size: 14px; }
   .prog-step.done .prog-dot span { display: none; }
   .prog-step.active .prog-dot {
     background: var(--white);
@@ -239,11 +239,11 @@
 
   label {
     display: block;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--white-soft);
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--white-mid);
     margin-bottom: 6px;
   }
 
@@ -359,11 +359,14 @@
   }
   .delivery-name {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 18px;
     color: var(--white);
     text-transform: none;
     letter-spacing: normal;
-    margin-bottom: 3px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   .delivery-desc {
     font-size: 12.5px;
@@ -374,28 +377,28 @@
     letter-spacing: normal;
   }
   .delivery-badge {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    padding: 2px 7px;
-    background: var(--bg-muted);
-    color: var(--white-soft);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    background: var(--orange);
+    color: var(--white);
     text-transform: none;
-    margin-top: 6px;
+    margin-top: 0;
     display: inline-block;
   }
   .delivery-badge .badge-price {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
     letter-spacing: 0;
-    color: var(--orange);
+    color: var(--white);
   }
   .delivery-option input:checked + .delivery-card .delivery-badge {
-    background: var(--orange-dim);
-    color: var(--white-mid);
+    background: var(--orange);
+    color: var(--white);
   }
   .delivery-option input:checked + .delivery-card .delivery-badge .badge-price {
-    color: var(--orange);
+    color: var(--white);
   }
 
   /* ── Primary button ─────────────────────── */
@@ -516,7 +519,7 @@
     margin: 1.5rem 0;
   }
   .order-label {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -530,7 +533,7 @@
     color: var(--bg);
   }
   .order-hint {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     color: var(--white-soft);
     margin-top: 0.35rem;
@@ -573,9 +576,9 @@
     color: var(--orange);
   }
   .nl-btn.selected-no {
-    border-color: var(--border);
-    background: var(--bg-muted);
-    color: var(--white-mid);
+    border-color: var(--orange);
+    background: var(--orange-bg);
+    color: var(--orange);
   }
 
   /* ── Loading ────────────────────────────── */
@@ -629,7 +632,6 @@
 
     <!-- Screen 1: Name -->
     <div class="screen active" id="screen-1">
-      <p class="screen-eyebrow" data-de="Schritt 1 von 4" data-en="Step 1 of 4">Schritt 1 von 4</p>
       <h2 class="screen-title" data-de="Dein Name" data-en="Your Name">Dein Name</h2>
       <p class="screen-sub" data-de="Wie sollen wir dich ansprechen?" data-en="How should we address you?">Wie sollen wir dich ansprechen?</p>
 
@@ -649,7 +651,6 @@
 
     <!-- Screen 2: Email -->
     <div class="screen" id="screen-2">
-      <p class="screen-eyebrow" data-de="Schritt 2 von 4" data-en="Step 2 of 4">Schritt 2 von 4</p>
       <h2 class="screen-title" data-de="Deine E-Mail" data-en="Your Email">Deine E-Mail</h2>
       <p class="screen-sub" data-de="Wir benachrichtigen dich, sobald der Katalog abholbereit oder unterwegs ist." data-en="We'll notify you as soon as the catalog is ready for pickup or on its way.">Wir benachrichtigen dich, sobald der Katalog abholbereit oder unterwegs ist.</p>
 
@@ -672,7 +673,6 @@
 
     <!-- Screen 3: Quantity -->
     <div class="screen" id="screen-3">
-      <p class="screen-eyebrow" data-de="Schritt 3 von 4" data-en="Step 3 of 4">Schritt 3 von 4</p>
       <h2 class="screen-title" data-de="Anzahl Exemplare" data-en="Number of Copies">Anzahl Exemplare</h2>
       <p class="screen-sub" data-de="Wie viele Kataloge möchtest du vorbestellen?" data-en="How many catalogs would you like to pre-order?">Wie viele Kataloge möchtest du vorbestellen?</p>
 
@@ -690,7 +690,6 @@
 
     <!-- Screen 4: Delivery -->
     <div class="screen" id="screen-4">
-      <p class="screen-eyebrow" data-de="Schritt 4 von 4" data-en="Step 4 of 4">Schritt 4 von 4</p>
       <h2 class="screen-title" data-de="Abholung oder Versand?" data-en="Pickup or Delivery?">Abholung oder Versand?</h2>
       <p class="screen-sub" data-de="Wie möchtest du deinen Katalog erhalten?" data-en="How would you like to receive your catalog?">Wie möchtest du deinen Katalog erhalten?</p>
 
@@ -700,9 +699,7 @@
           <div class="delivery-card">
             <div class="delivery-radio"></div>
             <div class="delivery-info">
-              <div class="delivery-name" data-de="Selbstabholung" data-en="Self-pickup">Selbstabholung</div>
-              <div class="delivery-desc" data-de="Du holst deinen Katalog selbst ab, sobald er fertig ist." data-en="Pick up your catalog yourself once it's ready.">Du holst deinen Katalog selbst ab, sobald er fertig ist.</div>
-              <span class="delivery-badge" data-de="Kostenlos" data-en="Free">Kostenlos</span>
+              <div class="delivery-name" data-de="Selbstabholung" data-en="Self-pickup">Selbstabholung <span class="delivery-badge" data-de="Kostenlos" data-en="Free">Kostenlos</span></div>
             </div>
           </div>
         </label>
@@ -712,15 +709,13 @@
           <div class="delivery-card">
             <div class="delivery-radio"></div>
             <div class="delivery-info">
-              <div class="delivery-name" data-de="Versand" data-en="Shipping">Versand</div>
-              <div class="delivery-desc" data-de="Wir senden dir den Katalog zu. Du hinterlegst deine Adresse direkt vor Ort." data-en="We'll ship the catalog to you. Leave your address on-site.">Wir senden dir den Katalog zu. Du hinterlegst deine Adresse direkt vor Ort.</div>
-              <span class="delivery-badge" data-de="<span class='badge-price'>+5 €</span> Versandkosten (Selbstbeteiligung)" data-en="<span class='badge-price'>+€5</span> shipping (at your expense)"><span class='badge-price'>+5 €</span> Versandkosten (Selbstbeteiligung)</span>
+              <div class="delivery-name" data-de="Versand" data-en="Shipping">Versand <span class="delivery-badge" data-de="<span class='badge-price'>+5 €</span>" data-en="<span class='badge-price'>+€5</span>"><span class='badge-price'>+5 €</span></span></div>
             </div>
           </div>
         </label>
       </div>
 
-      <button class="btn-primary" onclick="submitOrder()" id="submit-btn" data-de="Bestellung abschicken →" data-en="Submit order →">Bestellung abschicken →</button>
+      <button class="btn-primary" onclick="submitOrder()" id="submit-btn" data-de="Weiter →" data-en="Continue →">Weiter →</button>
     </div>
 
     <!-- Confirmation: Pickup -->
@@ -783,7 +778,7 @@ const T = {
     exhibition: 'Fotoausstellung · Berlin',
     catalogTitle: '<span>K</span>ATALOG<br>VORBESTELLUNG',
     thanksHeadline: 'Vielen Dank für<br>deine Bestellung!',
-    orderHint: 'Bitte notiere diese Nummer.',
+    orderHint: 'Bitte notiere deine Nummer.',
     pickupMsg: 'Wir schicken dir eine E-Mail, sobald dein Katalog abholbereit ist. Wir freuen uns auf deinen Besuch!',
     shippingMsg: '<strong>Bitte hinterlasse deine Lieferadresse vor Ort.</strong> Du findest dazu eine Adresskarte beim Ausstellungspersonal. Die Versandkosten von 5 € werden separat abgerechnet.',
     summaryName: 'Name', summaryEmail: 'E-Mail', summaryQty: 'Exemplare', summaryDelivery: 'Versand', summaryNewsletter: 'Newsletter',
