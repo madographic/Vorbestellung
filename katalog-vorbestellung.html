@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Katalog Vorbestellung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #111110;
+    --bg-card:   #1c1c1a;
+    --bg-input:  #242422;
+    --bg-muted:  #2a2a28;
+    --border:    #333330;
+    --border-focus: #d45f1e;
+    --white:     #f2f0ec;
+    --white-mid: #a8a6a2;
+    --white-soft:#5a5856;
+    --orange:    #d45f1e;
+    --orange-dim:#7a3610;
+    --orange-bg: #2a1a10;
+    --danger:    #c0392b;
+    --font: 'Barlow', sans-serif;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 5rem;
+  }
+
+  /* ── Header ─────────────────────────────── */
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 1.75rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .lang-toggle {
+    align-self: flex-end;
+    display: flex;
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .lang-btn {
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 5px 13px;
+    border: none;
+    background: transparent;
+    color: var(--white-soft);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s var(--ease);
+    text-transform: uppercase;
+  }
+  .lang-btn.active {
+    background: var(--orange);
+    color: var(--white);
+  }
+
+  .logo-area { text-align: left; width: 100%; }
+
+  .exhibition-name {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    color: var(--white-soft);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .catalog-title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1.0;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .catalog-title span { color: var(--orange); }
+
+  .header-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin-top: 0.25rem;
+  }
+
+  /* ── Main ───────────────────────────────── */
+  .main {
+    width: 100%;
+    max-width: 480px;
+    padding: 0 1.5rem;
+  }
+
+  /* ── Progress ───────────────────────────── */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .prog-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+  }
+  .prog-step::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .prog-step:last-child::after { display: none; }
+  .prog-step::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 50%;
+    width: 50%;
+    height: 1px;
+    background: var(--orange);
+    z-index: 0;
+    opacity: 0;
+  }
+  .prog-step.done::before { opacity: 1; }
+
+  .prog-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 0;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--white-soft);
+    z-index: 1;
+    transition: all 0.25s var(--ease);
+    position: relative;
+  }
+  .prog-step.done .prog-dot {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: var(--white);
+  }
+  .prog-step.done .prog-dot::after { content: '✓'; font-size: 11px; }
+  .prog-step.done .prog-dot span { display: none; }
+  .prog-step.active .prog-dot {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--bg);
+  }
+
+  .prog-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white-soft);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .prog-step.active .prog-label { color: var(--white); }
+  .prog-step.done .prog-label { color: var(--orange); }
+
+  /* ── Screens ────────────────────────────── */
+  .screen { display: none; animation: fadeUp 0.3s var(--ease) both; }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .screen-title {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--white);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+  }
+
+  .screen-sub {
+    font-size: 13.5px;
+    font-weight: 300;
+    color: var(--white-mid);
+    line-height: 1.55;
+    margin-bottom: 1.75rem;
+  }
+
+  /* ── Inputs ─────────────────────────────── */
+  .field { margin-bottom: 1rem; }
+
+  label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--white-soft);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="number"] {
+    width: 100%;
+    padding: 13px 14px;
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--white);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input::placeholder { color: var(--white-soft); }
+  input:focus { border-color: var(--orange); }
+  input.error { border-color: var(--danger); }
+
+  .field-error {
+    font-size: 11px;
+    color: var(--danger);
+    margin-top: 5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    display: none;
+  }
+  .field-error.show { display: block; }
+
+  /* ── Quantity ───────────────────────────── */
+  .qty-control {
+    display: flex;
+    align-items: center;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    height: 52px;
+    overflow: hidden;
+  }
+  .qty-btn {
+    width: 52px;
+    height: 100%;
+    background: none;
+    border: none;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--white-mid);
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .qty-btn:hover { background: var(--bg-muted); }
+  .qty-btn:active { background: var(--border); }
+  .qty-display {
+    flex: 1;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  /* ── Delivery ───────────────────────────── */
+  .delivery-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .delivery-option { position: relative; }
+  .delivery-option input[type="radio"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+  }
+  .delivery-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 15px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+  }
+  .delivery-option input:checked + .delivery-card {
+    border-color: var(--orange);
+    background: var(--orange-bg);
+  }
+  .delivery-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--bg-input);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .delivery-option input:checked + .delivery-card .delivery-radio {
+    border-color: var(--orange);
+    background: var(--orange);
+  }
+  .delivery-option input:checked + .delivery-card .delivery-radio::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+  }
+  .delivery-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--white);
+    text-transform: none;
+    letter-spacing: normal;
+    margin-bottom: 3px;
+  }
+  .delivery-desc {
+    font-size: 12.5px;
+    font-weight: 300;
+    color: var(--white-mid);
+    line-height: 1.45;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  .delivery-badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    background: var(--bg-muted);
+    color: var(--white-soft);
+    text-transform: none;
+    margin-top: 6px;
+    display: inline-block;
+  }
+  .delivery-badge .badge-price {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--orange);
+  }
+  .delivery-option input:checked + .delivery-card .delivery-badge {
+    background: var(--orange-dim);
+    color: var(--white-mid);
+  }
+  .delivery-option input:checked + .delivery-card .delivery-badge .badge-price {
+    color: var(--orange);
+  }
+
+  /* ── Primary button ─────────────────────── */
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    margin-top: 1.5rem;
+  }
+  .btn-primary:hover { background: #e8721f; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* ── Confirm box ────────────────────────── */
+  .confirm-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+    margin: 1.25rem 0;
+  }
+  .confirm-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--bg-muted);
+    font-size: 13.5px;
+  }
+  .confirm-row:last-child { border-bottom: none; }
+  .confirm-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--white-soft);
+  }
+  .confirm-value { font-weight: 500; color: var(--white); text-align: right; max-width: 55%; }
+
+  .info-block {
+    background: var(--orange-bg);
+    border-left: 3px solid var(--orange);
+    padding: 14px 16px;
+    font-size: 13.5px;
+    font-weight: 300;
+    color: var(--white-mid);
+    line-height: 1.6;
+    margin: 1rem 0 1.5rem;
+  }
+
+  .shipping-note {
+    background: var(--orange-bg);
+    border: 1px solid var(--orange-dim);
+    padding: 15px 16px;
+    font-size: 13.5px;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--white-mid);
+    margin: 1rem 0 1.5rem;
+  }
+  .shipping-note strong { font-weight: 600; color: var(--white); }
+
+  /* ── Thank you ──────────────────────────── */
+  .thank-icon {
+    font-size: 2rem;
+    text-align: center;
+    margin: 0.75rem 0 0.5rem;
+    color: var(--orange);
+  }
+
+  .order-number-box {
+    background: var(--white);
+    color: var(--bg);
+    padding: 1.5rem;
+    text-align: center;
+    margin: 1.5rem 0;
+  }
+  .order-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 0.5rem;
+  }
+  .order-number {
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--bg);
+  }
+  .order-hint {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--white-soft);
+    margin-top: 0.35rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* ── Newsletter ─────────────────────────── */
+  .newsletter-wrap { margin: 1.25rem 0 0; }
+  .newsletter-label-txt {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--white-mid);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+  }
+  .nl-toggle { display: flex; gap: 0.5rem; }
+  .nl-btn {
+    flex: 1;
+    padding: 13px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--white-soft);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    text-align: center;
+  }
+  .nl-btn.selected-yes {
+    border-color: var(--orange);
+    background: var(--orange-bg);
+    color: var(--orange);
+  }
+  .nl-btn.selected-no {
+    border-color: var(--border);
+    background: var(--bg-muted);
+    color: var(--white-mid);
+  }
+
+  /* ── Loading ────────────────────────────── */
+  .btn-loading { opacity: 0.7; pointer-events: none; }
+  .spinner {
+    display: inline-block;
+    width: 13px; height: 13px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: -2px;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="logo-area">
+      <p class="exhibition-name" id="lbl-exhibition">Fotoausstellung · Berlin</p>
+      <h1 class="catalog-title" id="lbl-catalog-title"><span>K</span>ATALOG<br>VORBESTELLUNG</h1>
+      <div class="header-rule"></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Progress -->
+    <div class="progress-wrap" id="progress-bar">
+      <div class="prog-step active" id="p1">
+        <div class="prog-dot"><span>1</span></div>
+        <div class="prog-label" data-de="Name" data-en="Name">Name</div>
+      </div>
+      <div class="prog-step" id="p2">
+        <div class="prog-dot"><span>2</span></div>
+        <div class="prog-label" data-de="E-Mail" data-en="Email">E-Mail</div>
+      </div>
+      <div class="prog-step" id="p3">
+        <div class="prog-dot"><span>3</span></div>
+        <div class="prog-label" data-de="Anzahl" data-en="Qty">Anzahl</div>
+      </div>
+      <div class="prog-step" id="p4">
+        <div class="prog-dot"><span>4</span></div>
+        <div class="prog-label" data-de="Versand" data-en="Delivery">Versand</div>
+      </div>
+    </div>
+
+    <!-- Screen 1: Name -->
+    <div class="screen active" id="screen-1">
+      <p class="screen-eyebrow" data-de="Schritt 1 von 4" data-en="Step 1 of 4">Schritt 1 von 4</p>
+      <h2 class="screen-title" data-de="Dein Name" data-en="Your Name">Dein Name</h2>
+      <p class="screen-sub" data-de="Wie sollen wir dich ansprechen?" data-en="How should we address you?">Wie sollen wir dich ansprechen?</p>
+
+      <div class="field">
+        <label data-de="NACHNAME" data-en="LAST NAME">NACHNAME</label>
+        <input type="text" id="name" placeholder="Müller" autocomplete="family-name">
+        <div class="field-error" id="name-error" data-de="Bitte Nachnamen eingeben." data-en="Please enter your last name.">Bitte Nachnamen eingeben.</div>
+      </div>
+      <div class="field">
+        <label data-de="VORNAME" data-en="FIRST NAME">VORNAME</label>
+        <input type="text" id="vorname" placeholder="Anna" autocomplete="given-name">
+        <div class="field-error" id="vorname-error" data-de="Bitte Vornamen eingeben." data-en="Please enter your first name.">Bitte Vornamen eingeben.</div>
+      </div>
+
+      <button class="btn-primary" onclick="goTo(2)" data-de="Weiter →" data-en="Continue →">Weiter →</button>
+    </div>
+
+    <!-- Screen 2: Email -->
+    <div class="screen" id="screen-2">
+      <p class="screen-eyebrow" data-de="Schritt 2 von 4" data-en="Step 2 of 4">Schritt 2 von 4</p>
+      <h2 class="screen-title" data-de="Deine E-Mail" data-en="Your Email">Deine E-Mail</h2>
+      <p class="screen-sub" data-de="Wir benachrichtigen dich, sobald der Katalog abholbereit oder unterwegs ist." data-en="We'll notify you as soon as the catalog is ready for pickup or on its way.">Wir benachrichtigen dich, sobald der Katalog abholbereit oder unterwegs ist.</p>
+
+      <div class="field">
+        <label>E-MAIL</label>
+        <input type="email" id="email" placeholder="anna@beispiel.de" autocomplete="email" inputmode="email">
+        <div class="field-error" id="email-error" data-de="Bitte gültige E-Mail-Adresse eingeben." data-en="Please enter a valid email address.">Bitte gültige E-Mail-Adresse eingeben.</div>
+      </div>
+
+      <div class="newsletter-wrap">
+        <p class="newsletter-label-txt" id="nl-question-text" data-de="Möchtest du unseren Newsletter erhalten? (optional)" data-en="Would you like to receive our newsletter? (optional)">Möchtest du unseren Newsletter erhalten? (optional)</p>
+        <div class="nl-toggle">
+          <button class="nl-btn" id="nl-yes" onclick="setNewsletter(true)" data-de="Ja, gerne" data-en="Yes, please">Ja, gerne</button>
+          <button class="nl-btn" id="nl-no" onclick="setNewsletter(false)" data-de="Nein danke" data-en="No thanks">Nein danke</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="goTo(3)" data-de="Weiter →" data-en="Continue →">Weiter →</button>
+    </div>
+
+    <!-- Screen 3: Quantity -->
+    <div class="screen" id="screen-3">
+      <p class="screen-eyebrow" data-de="Schritt 3 von 4" data-en="Step 3 of 4">Schritt 3 von 4</p>
+      <h2 class="screen-title" data-de="Anzahl Exemplare" data-en="Number of Copies">Anzahl Exemplare</h2>
+      <p class="screen-sub" data-de="Wie viele Kataloge möchtest du vorbestellen?" data-en="How many catalogs would you like to pre-order?">Wie viele Kataloge möchtest du vorbestellen?</p>
+
+      <div class="field">
+        <label data-de="EXEMPLARE" data-en="COPIES">EXEMPLARE</label>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(-1)" aria-label="Weniger">−</button>
+          <div class="qty-display" id="qty-display">1</div>
+          <button class="qty-btn" onclick="changeQty(1)" aria-label="Mehr">+</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="goTo(4)" data-de="Weiter →" data-en="Continue →">Weiter →</button>
+    </div>
+
+    <!-- Screen 4: Delivery -->
+    <div class="screen" id="screen-4">
+      <p class="screen-eyebrow" data-de="Schritt 4 von 4" data-en="Step 4 of 4">Schritt 4 von 4</p>
+      <h2 class="screen-title" data-de="Abholung oder Versand?" data-en="Pickup or Delivery?">Abholung oder Versand?</h2>
+      <p class="screen-sub" data-de="Wie möchtest du deinen Katalog erhalten?" data-en="How would you like to receive your catalog?">Wie möchtest du deinen Katalog erhalten?</p>
+
+      <div class="delivery-options">
+        <label class="delivery-option">
+          <input type="radio" name="delivery" value="pickup" checked>
+          <div class="delivery-card">
+            <div class="delivery-radio"></div>
+            <div class="delivery-info">
+              <div class="delivery-name" data-de="Selbstabholung" data-en="Self-pickup">Selbstabholung</div>
+              <div class="delivery-desc" data-de="Du holst deinen Katalog selbst ab, sobald er fertig ist." data-en="Pick up your catalog yourself once it's ready.">Du holst deinen Katalog selbst ab, sobald er fertig ist.</div>
+              <span class="delivery-badge" data-de="Kostenlos" data-en="Free">Kostenlos</span>
+            </div>
+          </div>
+        </label>
+
+        <label class="delivery-option">
+          <input type="radio" name="delivery" value="shipping">
+          <div class="delivery-card">
+            <div class="delivery-radio"></div>
+            <div class="delivery-info">
+              <div class="delivery-name" data-de="Versand" data-en="Shipping">Versand</div>
+              <div class="delivery-desc" data-de="Wir senden dir den Katalog zu. Du hinterlegst deine Adresse direkt vor Ort." data-en="We'll ship the catalog to you. Leave your address on-site.">Wir senden dir den Katalog zu. Du hinterlegst deine Adresse direkt vor Ort.</div>
+              <span class="delivery-badge" data-de="<span class='badge-price'>+5 €</span> Versandkosten (Selbstbeteiligung)" data-en="<span class='badge-price'>+€5</span> shipping (at your expense)"><span class='badge-price'>+5 €</span> Versandkosten (Selbstbeteiligung)</span>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <button class="btn-primary" onclick="submitOrder()" id="submit-btn" data-de="Bestellung abschicken →" data-en="Submit order →">Bestellung abschicken →</button>
+    </div>
+
+    <!-- Confirmation: Pickup -->
+    <div class="screen" id="screen-confirm-pickup">
+      <p class="screen-eyebrow" data-de="Bestätigung" data-en="Confirmation">Bestätigung</p>
+      <h2 class="screen-title" data-de="Vorbestellung eingegangen" data-en="Pre-order received">Vorbestellung eingegangen</h2>
+
+      <div class="confirm-box" id="pickup-summary"></div>
+
+      <div class="info-block">
+        <span id="pickup-msg-text"></span>
+      </div>
+
+      <button class="btn-primary" onclick="goTo('thanks')" data-de="Bestätigen →" data-en="Confirm →">Bestätigen →</button>
+    </div>
+
+    <!-- Confirmation: Shipping -->
+    <div class="screen" id="screen-confirm-shipping">
+      <p class="screen-eyebrow" data-de="Bestätigung" data-en="Confirmation">Bestätigung</p>
+      <h2 class="screen-title" data-de="Vorbestellung eingegangen" data-en="Pre-order received">Vorbestellung eingegangen</h2>
+
+      <div class="confirm-box" id="shipping-summary"></div>
+
+      <div class="shipping-note">
+        <span id="shipping-msg-text"></span>
+      </div>
+
+      <button class="btn-primary" onclick="goTo('thanks')" data-de="Verstanden →" data-en="Got it →">Verstanden →</button>
+    </div>
+
+    <!-- Thank you screen -->
+    <div class="screen" id="screen-thanks">
+      <div class="thank-icon">✦</div>
+      <p class="screen-eyebrow" style="text-align:center;" data-de="Vielen Dank" data-en="Thank you">Vielen Dank</p>
+      <h2 class="screen-title" style="text-align:center; font-size:1.9rem;" id="thanks-headline">Vielen Dank für<br>deine Bestellung!</h2>
+
+      <div class="order-number-box">
+        <div class="order-label" data-de="Deine Bestellnummer" data-en="Your order number">Deine Bestellnummer</div>
+        <div class="order-number" id="order-number-display">1405001</div>
+        <div class="order-hint" id="order-hint-text"></div>
+      </div>
+
+      <div class="confirm-box" id="thanks-summary"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────
+const state = {
+  lang: 'de',
+  name: '', vorname: '', email: '',
+  qty: 1, delivery: 'pickup',
+  newsletter: null,
+  orderNumber: ''
+};
+
+// ─── Language strings ─────────────────────────────────
+const T = {
+  de: {
+    exhibition: 'Fotoausstellung · Berlin',
+    catalogTitle: '<span>K</span>ATALOG<br>VORBESTELLUNG',
+    thanksHeadline: 'Vielen Dank für<br>deine Bestellung!',
+    orderHint: 'Bitte notiere diese Nummer.',
+    pickupMsg: 'Wir schicken dir eine E-Mail, sobald dein Katalog abholbereit ist. Wir freuen uns auf deinen Besuch!',
+    shippingMsg: '<strong>Bitte hinterlasse deine Lieferadresse vor Ort.</strong> Du findest dazu eine Adresskarte beim Ausstellungspersonal. Die Versandkosten von 5 € werden separat abgerechnet.',
+    summaryName: 'Name', summaryEmail: 'E-Mail', summaryQty: 'Exemplare', summaryDelivery: 'Versand', summaryNewsletter: 'Newsletter',
+    newsletterYes: 'Ja', newsletterNo: 'Nein', newsletterNone: '—',
+    pickup: 'Selbstabholung', shipping: 'Versand (+5 €)'
+  },
+  en: {
+    exhibition: 'Photo Exhibition · Berlin',
+    catalogTitle: '<span>C</span>ATALOG<br>PRE-ORDER',
+    thanksHeadline: 'Thank you for<br>your order!',
+    orderHint: 'Please note this number.',
+    pickupMsg: "We'll send you an email as soon as your catalog is ready for pickup. We look forward to seeing you!",
+    shippingMsg: '<strong>Please leave your delivery address on-site.</strong> You\'ll find an address card with the exhibition staff. The €5 shipping fee will be charged separately.',
+    summaryName: 'Name', summaryEmail: 'Email', summaryQty: 'Copies', summaryDelivery: 'Delivery', summaryNewsletter: 'Newsletter',
+    newsletterYes: 'Yes', newsletterNo: 'No', newsletterNone: '—',
+    pickup: 'Self-pickup', shipping: 'Shipping (+€5)'
+  }
+};
+
+// ─── Language toggle ───────────────────────────────────
+function setLang(lang) {
+  state.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === lang.toUpperCase());
+  });
+  document.querySelectorAll('[data-de]').forEach(el => {
+    const txt = el.getAttribute('data-' + lang);
+    if (txt) el.innerHTML = txt;
+  });
+  const t = T[lang];
+  document.getElementById('lbl-exhibition').textContent = t.exhibition;
+  document.getElementById('lbl-catalog-title').innerHTML = t.catalogTitle;
+  if (document.getElementById('screen-thanks').classList.contains('active')) {
+    document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
+    document.getElementById('order-hint-text').textContent = t.orderHint;
+    renderThanksSummary();
+  }
+}
+
+// ─── Progress bar ──────────────────────────────────────
+function updateProgress(step) {
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById('p' + i);
+    el.className = 'prog-step';
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  });
+}
+
+// ─── Navigation ────────────────────────────────────────
+let currentScreen = 1;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  if (el) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth', block:'start'}); }
+}
+
+function goTo(step) {
+  if (step === 2) {
+    if (!validateStep1()) return;
+    currentScreen = 2;
+    updateProgress(2);
+    showScreen(2);
+  } else if (step === 3) {
+    if (!validateStep2()) return;
+    currentScreen = 3;
+    updateProgress(3);
+    showScreen(3);
+  } else if (step === 4) {
+    currentScreen = 4;
+    updateProgress(4);
+    showScreen(4);
+  } else if (step === 'thanks') {
+    state.orderNumber = generateOrderNumber();
+    renderThanksSummary();
+    document.getElementById('order-number-display').textContent = state.orderNumber;
+    const t = T[state.lang];
+    document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
+    document.getElementById('order-hint-text').textContent = t.orderHint;
+    document.getElementById('progress-bar').style.display = 'none';
+    showScreen('thanks');
+    submitToSheets();
+  }
+}
+
+// ─── Validation ────────────────────────────────────────
+function validateStep1() {
+  let ok = true;
+  const nameVal = document.getElementById('name').value.trim();
+  const vorVal  = document.getElementById('vorname').value.trim();
+  const nameErr = document.getElementById('name-error');
+  const vorErr  = document.getElementById('vorname-error');
+  if (!nameVal) {
+    document.getElementById('name').classList.add('error');
+    nameErr.classList.add('show');
+    ok = false;
+  } else {
+    document.getElementById('name').classList.remove('error');
+    nameErr.classList.remove('show');
+    state.name = nameVal;
+  }
+  if (!vorVal) {
+    document.getElementById('vorname').classList.add('error');
+    vorErr.classList.add('show');
+    ok = false;
+  } else {
+    document.getElementById('vorname').classList.remove('error');
+    vorErr.classList.remove('show');
+    state.vorname = vorVal;
+  }
+  return ok;
+}
+
+function validateStep2() {
+  const emailVal = document.getElementById('email').value.trim();
+  const emailErr = document.getElementById('email-error');
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+  if (!valid) {
+    document.getElementById('email').classList.add('error');
+    emailErr.classList.add('show');
+    return false;
+  }
+  document.getElementById('email').classList.remove('error');
+  emailErr.classList.remove('show');
+  state.email = emailVal;
+  return true;
+}
+
+// ─── Newsletter ────────────────────────────────────────
+function setNewsletter(val) {
+  state.newsletter = val;
+  document.getElementById('nl-yes').className = 'nl-btn' + (val === true  ? ' selected-yes' : '');
+  document.getElementById('nl-no').className  = 'nl-btn' + (val === false ? ' selected-no'  : '');
+}
+
+// ─── Quantity ──────────────────────────────────────────
+function changeQty(delta) {
+  state.qty = Math.max(1, Math.min(20, state.qty + delta));
+  document.getElementById('qty-display').textContent = state.qty;
+}
+
+// ─── Order number generator ────────────────────────────
+function generateOrderNumber() {
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2, '0');
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const prefix = dd + mm;
+
+  let counters = JSON.parse(localStorage.getItem('order_counters') || '{}');
+  const key = prefix;
+  if (!counters[key]) counters[key] = 1;
+  const seq = String(counters[key]).padStart(3, '0');
+  counters[key]++;
+  localStorage.setItem('order_counters', JSON.stringify(counters));
+
+  return prefix + seq;
+}
+
+// ─── Submit order ──────────────────────────────────────
+function submitOrder() {
+  state.delivery = document.querySelector('input[name="delivery"]:checked').value;
+  const t = T[state.lang];
+  const summaryHTML = buildSummaryHTML(t);
+
+  if (state.delivery === 'pickup') {
+    document.getElementById('pickup-summary').innerHTML = summaryHTML;
+    document.getElementById('pickup-msg-text').innerHTML = t.pickupMsg;
+    showScreen('confirm-pickup');
+  } else {
+    document.getElementById('shipping-summary').innerHTML = summaryHTML;
+    document.getElementById('shipping-msg-text').innerHTML = t.shippingMsg;
+    showScreen('confirm-shipping');
+  }
+  document.getElementById('progress-bar').style.display = 'none';
+}
+
+function buildSummaryHTML(t) {
+  const deliveryLabel = state.delivery === 'pickup' ? t.pickup : t.shipping;
+  const nlLabel = state.newsletter === true ? t.newsletterYes : state.newsletter === false ? t.newsletterNo : t.newsletterNone;
+  return `
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryName}</span>
+      <span class="confirm-value">${state.name}, ${state.vorname}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryEmail}</span>
+      <span class="confirm-value">${state.email}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryQty}</span>
+      <span class="confirm-value">${state.qty}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryDelivery}</span>
+      <span class="confirm-value">${deliveryLabel}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryNewsletter}</span>
+      <span class="confirm-value">${nlLabel}</span>
+    </div>
+  `;
+}
+
+function renderThanksSummary() {
+  const t = T[state.lang];
+  document.getElementById('thanks-summary').innerHTML = buildSummaryHTML(t);
+}
+
+// ─── Google Sheets submission ──────────────────────────
+// ⚠️  Replace APPS_SCRIPT_URL with your deployed Google Apps Script Web App URL
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7viyl5iIFx8182nvEeogS0a77Gh94vDPIjxHoXcz7PTYGU3ohZItJDwYpyHJdDmbz/exec';
+
+async function submitToSheets() {
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return; // skip if not configured
+
+  const payload = {
+    name: state.name,
+    vorname: state.vorname,
+    email: state.email,
+    stueck: state.qty,
+    selbstabholung: state.delivery === 'pickup' ? 'Ja' : '',
+    lieferung: state.delivery === 'shipping' ? 'Ja' : '',
+    bestellnummer: state.orderNumber,
+    newsletter: state.newsletter === true ? 'Ja' : state.newsletter === false ? 'Nein' : '',
+    bezahlung: ''
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    console.error('Sheets submission failed:', e);
+  }
+}
+
+// ─── Init ──────────────────────────────────────────────
+document.querySelectorAll('input[type="text"], input[type="email"]').forEach(input => {
+  input.addEventListener('input', () => {
+    input.classList.remove('error');
+    const errId = input.id + '-error';
+    const errEl = document.getElementById(errId);
+    if (errEl) errEl.classList.remove('show');
+  });
+});
+</script>
+</body>
+</html>
