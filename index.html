@@ -578,6 +578,33 @@
     color: var(--orange);
   }
 
+  /* ── GDPR consent ───────────────────────── */
+  .gdpr-wrap {
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .gdpr-checkbox {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: var(--orange);
+    cursor: pointer;
+  }
+  .gdpr-text {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--white-soft);
+    line-height: 1.6;
+  }
+  .gdpr-text a {
+    color: var(--orange);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
   /* ── Payment notice ─────────────────────── */
   .payment-notice {
     border: 1.5px solid var(--orange);
@@ -773,7 +800,12 @@
         <span id="pickup-msg-text"></span>
       </div>
 
-      <button class="btn-primary" onclick="goTo('thanks')" data-de="Bestellung bestätigen →" data-en="Confirm order →">Bestellung bestätigen →</button>
+      <div class="gdpr-wrap">
+        <input type="checkbox" class="gdpr-checkbox" id="gdpr-pickup" onchange="checkGdpr('pickup')">
+        <label for="gdpr-pickup" class="gdpr-text" id="gdpr-text-pickup">Ich stimme zu, dass meine Daten (Name, E-Mail) ausschließlich zur Abwicklung meiner Katalogbestellung verwendet und danach gelöscht werden. Verantwortlich: Museum der Trostfrauen.</label>
+      </div>
+
+      <button class="btn-primary" onclick="goTo('thanks')" id="btn-confirm-pickup" disabled data-de="Bestellung bestätigen →" data-en="Confirm order →">Bestellung bestätigen →</button>
     </div>
 
     <!-- Confirmation: Shipping -->
@@ -783,7 +815,12 @@
 
       <div class="confirm-box" id="shipping-summary"></div>
 
-      <button class="btn-primary" onclick="goTo('thanks')" data-de="Bestellung bestätigen →" data-en="Confirm order →">Bestellung bestätigen →</button>
+      <div class="gdpr-wrap">
+        <input type="checkbox" class="gdpr-checkbox" id="gdpr-shipping" onchange="checkGdpr('shipping')">
+        <label for="gdpr-shipping" class="gdpr-text" id="gdpr-text-shipping">Ich stimme zu, dass meine Daten (Name, E-Mail, Adresse) ausschließlich zur Abwicklung meiner Katalogbestellung verwendet und danach gelöscht werden. Verantwortlich: Museum der Trostfrauen.</label>
+      </div>
+
+      <button class="btn-primary" onclick="goTo('thanks')" id="btn-confirm-shipping" disabled data-de="Bestellung bestätigen →" data-en="Confirm order →">Bestellung bestätigen →</button>
     </div>
 
     <!-- Thank you screen -->
@@ -824,7 +861,8 @@ const T = {
     orderHint: 'Bitte notiere deine Nummer.',
     pickupMsg: 'Wir schicken dir eine E-Mail, sobald dein Katalog abholbereit ist. Wir freuen uns auf deinen Besuch!',
     shippingMsg: '<strong>Bitte hinterlasse deine Lieferadresse vor Ort.</strong> Du findest dazu eine Adresskarte beim Ausstellungspersonal. Die Versandkosten von 5 € werden separat abgerechnet.',
-    summaryName: 'Name', summaryEmail: 'E-Mail', summaryQty: 'Exemplare', summaryDelivery: 'Versand', summaryNewsletter: 'Newsletter', summaryAddress: 'Lieferadresse',
+    gdprPickup: 'Ich stimme zu, dass meine Daten (Name, E-Mail) ausschließlich zur Abwicklung meiner Katalogbestellung verwendet und danach gelöscht werden. Verantwortlich: Museum der Trostfrauen.',
+    gdprShipping: 'Ich stimme zu, dass meine Daten (Name, E-Mail, Adresse) ausschließlich zur Abwicklung meiner Katalogbestellung verwendet und danach gelöscht werden. Verantwortlich: Museum der Trostfrauen.',
     newsletterYes: 'Ja', newsletterNo: 'Nein', newsletterNone: '—',
     editLabel: 'Ändern',
     pickup: 'Selbstabholung', shipping: 'Versand (+5 €)',
@@ -851,7 +889,8 @@ const T = {
     orderHint: 'Please note this number.',
     pickupMsg: "We'll send you an email as soon as your catalog is ready for pickup. We look forward to seeing you!",
     shippingMsg: '',
-    summaryName: 'Name', summaryEmail: 'Email', summaryQty: 'Copies', summaryDelivery: 'Delivery', summaryNewsletter: 'Newsletter', summaryAddress: 'Delivery address',
+    gdprPickup: 'I agree that my data (name, email) will be used solely for processing my catalog order and deleted afterwards. Responsible: Museum der Trostfrauen.',
+    gdprShipping: 'I agree that my data (name, email, address) will be used solely for processing my catalog order and deleted afterwards. Responsible: Museum der Trostfrauen.',
     newsletterYes: 'Yes', newsletterNo: 'No', newsletterNone: '—',
     editLabel: 'Edit',
     pickup: 'Self-pickup', shipping: 'Shipping (+€5)',
@@ -885,6 +924,8 @@ function setLang(lang) {
   });
   const t = T[lang];
   document.getElementById('lbl-catalog-title').innerHTML = t.catalogTitle;
+  document.getElementById('gdpr-text-pickup').textContent = t.gdprPickup;
+  document.getElementById('gdpr-text-shipping').textContent = t.gdprShipping;
   if (document.getElementById('screen-thanks').classList.contains('active')) {
     document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
     document.getElementById('order-hint-text').textContent = t.orderHint;
@@ -1028,8 +1069,19 @@ function generateOrderNumber() {
   return prefix + seq;
 }
 
+// ─── GDPR checkbox ─────────────────────────────────────
+function checkGdpr(type) {
+  const checked = document.getElementById('gdpr-' + type).checked;
+  document.getElementById('btn-confirm-' + type).disabled = !checked;
+}
+
 // ─── Edit from confirmation ────────────────────────────
 function editStep(step) {
+  // 確認画面に戻るときGDPRチェックをリセット
+  document.getElementById('gdpr-pickup').checked = false;
+  document.getElementById('gdpr-shipping').checked = false;
+  document.getElementById('btn-confirm-pickup').disabled = true;
+  document.getElementById('btn-confirm-shipping').disabled = true;
   document.getElementById('progress-bar').style.display = 'flex';
   updateProgress(step);
   showScreen(step);
