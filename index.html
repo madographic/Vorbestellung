@@ -1201,6 +1201,12 @@ async function submitToSheets() {
   const dd = String(now.getDate()).padStart(2, '0');
   const datePrefix = mm + dd;
 
+  // 注文番号はローカルで生成（no-corsではレスポンスが読めないため）
+  let counter = parseInt(localStorage.getItem('order_counter_total') || '0');
+  counter++;
+  localStorage.setItem('order_counter_total', String(counter));
+  const bestellnummer = datePrefix + String(counter).padStart(3, '0');
+
   const payload = {
     name: state.name,
     vorname: state.vorname,
@@ -1211,26 +1217,19 @@ async function submitToSheets() {
     adresse: state.delivery === 'shipping' ? `${state.strasse}, ${state.plz} ${state.stadt}, ${state.land}` : '',
     newsletter: state.newsletter === true ? 'Ja' : state.newsletter === false ? 'Nein' : '',
     bezahlung: '',
+    bestellnummer: bestellnummer,
     datePrefix: datePrefix
   };
 
-  try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await response.json();
-    if (data.bestellnummer) return data.bestellnummer;
-  } catch (e) {
-    console.error('Sheets submission failed:', e);
-  }
+  // no-cors：レスポンスは読めないがスプレッドシートへの書き込みは確実に届く
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(e => console.warn('Sheets send failed:', e));
 
-  // フォールバック：通信失敗時はローカルで生成
-  let counter = parseInt(localStorage.getItem('order_counter_total') || '0');
-  counter++;
-  localStorage.setItem('order_counter_total', String(counter));
-  return datePrefix + String(counter).padStart(3, '0');
+  return bestellnummer;
 }
 
 // ─── Init: リアルタイム入力チェック ───────────────────
