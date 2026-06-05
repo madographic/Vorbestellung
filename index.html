@@ -1253,7 +1253,7 @@ async function submitToSheets() {
   const dd = String(now.getDate()).padStart(2, '0');
   const datePrefix = mm + dd;
 
-  // 注文番号はローカルで生成（no-corsではレスポンスが読めないため）
+  // 注文番号をローカルで生成
   let counter = parseInt(localStorage.getItem('order_counter_total') || '0');
   counter++;
   localStorage.setItem('order_counter_total', String(counter));
@@ -1273,13 +1273,37 @@ async function submitToSheets() {
     datePrefix: datePrefix
   };
 
-  // no-cors：レスポンスは読めないがスプレッドシートへの書き込みは確実に届く
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(e => console.warn('Sheets send failed:', e));
+  // 隠しiframe + フォームPOSTでCORSを回避
+  try {
+    const iframe = document.createElement('iframe');
+    iframe.name = 'hidden-submit';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = APPS_SCRIPT_URL;
+    form.target = 'hidden-submit';
+    form.style.display = 'none';
+
+    // JSONをひとつのフィールドで送る
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'data';
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit();
+
+    // 送信後にクリーンアップ
+    setTimeout(() => {
+      document.body.removeChild(form);
+      document.body.removeChild(iframe);
+    }, 3000);
+  } catch(e) {
+    console.warn('Sheets send failed:', e);
+  }
 
   return bestellnummer;
 }
