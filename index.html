@@ -578,6 +578,17 @@
     color: var(--orange);
   }
 
+  /* ── Payment notice ─────────────────────── */
+  .payment-notice {
+    border: 1.5px solid var(--orange);
+    color: var(--orange);
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.55;
+    margin: 1.25rem 0;
+  }
+
   /* ── Loading ────────────────────────────── */
   .btn-loading { opacity: 0.7; pointer-events: none; }
   .spinner {
@@ -721,6 +732,36 @@
       <button class="btn-primary" onclick="submitOrder()" id="submit-btn" data-de="Weiter →" data-en="Continue →">Weiter →</button>
     </div>
 
+    <!-- Screen 5: Address (Versand only) -->
+    <div class="screen" id="screen-5">
+      <p class="screen-eyebrow" id="addr-eyebrow">Lieferadresse</p>
+      <h2 class="screen-title" id="addr-title">Lieferadresse</h2>
+      <p class="screen-sub" id="addr-sub">Wohin sollen wir deinen Katalog schicken?</p>
+
+      <div class="field">
+        <label id="lbl-strasse">Straße und Hausnummer</label>
+        <input type="text" id="strasse" placeholder="Musterstraße 1" autocomplete="street-address">
+        <div class="field-error" id="strasse-error">Bitte Straße eingeben.</div>
+      </div>
+      <div class="field">
+        <label id="lbl-plz">PLZ</label>
+        <input type="text" id="plz" placeholder="10115" autocomplete="postal-code" inputmode="numeric">
+        <div class="field-error" id="plz-error">Bitte PLZ eingeben.</div>
+      </div>
+      <div class="field">
+        <label id="lbl-stadt">Stadt</label>
+        <input type="text" id="stadt" placeholder="Berlin" autocomplete="address-level2">
+        <div class="field-error" id="stadt-error">Bitte Stadt eingeben.</div>
+      </div>
+      <div class="field">
+        <label id="lbl-land">Land</label>
+        <input type="text" id="land" placeholder="Deutschland" autocomplete="country-name">
+        <div class="field-error" id="land-error">Bitte Land eingeben.</div>
+      </div>
+
+      <button class="btn-primary" onclick="goToConfirm()" id="btn-addr" data-de="Weiter →" data-en="Continue →">Weiter →</button>
+    </div>
+
     <!-- Confirmation: Pickup -->
     <div class="screen" id="screen-confirm-pickup">
       <p class="screen-eyebrow" data-de="Bestätigung" data-en="Confirmation">Bestätigung</p>
@@ -742,10 +783,6 @@
 
       <div class="confirm-box" id="shipping-summary"></div>
 
-      <div class="shipping-note">
-        <span id="shipping-msg-text"></span>
-      </div>
-
       <button class="btn-primary" onclick="goTo('thanks')" data-de="Bestellung bestätigen →" data-en="Confirm order →">Bestellung bestätigen →</button>
     </div>
 
@@ -760,6 +797,8 @@
         <div class="order-hint" id="order-hint-text"></div>
       </div>
 
+      <div class="payment-notice" id="payment-notice-text"></div>
+
       <div class="confirm-box" id="thanks-summary"></div>
     </div>
   </main>
@@ -772,6 +811,7 @@ const state = {
   name: '', vorname: '', email: '',
   qty: 1, delivery: 'pickup',
   newsletter: null,
+  strasse: '', plz: '', stadt: '', land: '',
   orderNumber: ''
 };
 
@@ -784,10 +824,25 @@ const T = {
     orderHint: 'Bitte notiere deine Nummer.',
     pickupMsg: 'Wir schicken dir eine E-Mail, sobald dein Katalog abholbereit ist. Wir freuen uns auf deinen Besuch!',
     shippingMsg: '<strong>Bitte hinterlasse deine Lieferadresse vor Ort.</strong> Du findest dazu eine Adresskarte beim Ausstellungspersonal. Die Versandkosten von 5 € werden separat abgerechnet.',
-    summaryName: 'Name', summaryEmail: 'E-Mail', summaryQty: 'Exemplare', summaryDelivery: 'Versand', summaryNewsletter: 'Newsletter',
+    summaryName: 'Name', summaryEmail: 'E-Mail', summaryQty: 'Exemplare', summaryDelivery: 'Versand', summaryNewsletter: 'Newsletter', summaryAddress: 'Lieferadresse',
     newsletterYes: 'Ja', newsletterNo: 'Nein', newsletterNone: '—',
     editLabel: 'Ändern',
-    pickup: 'Selbstabholung', shipping: 'Versand (+5 €)'
+    pickup: 'Selbstabholung', shipping: 'Versand (+5 €)',
+    addressTitle: 'Lieferadresse',
+    addressSub: 'Wohin sollen wir deinen Katalog schicken?',
+    labelStrasse: 'Straße und Hausnummer',
+    labelPlz: 'PLZ',
+    labelStadt: 'Stadt',
+    labelLand: 'Land',
+    placeholderStrasse: 'Musterstraße 1',
+    placeholderPlz: '10115',
+    placeholderStadt: 'Berlin',
+    placeholderLand: 'Deutschland',
+    errorStrasse: 'Bitte Straße eingeben.',
+    errorPlz: 'Bitte PLZ eingeben.',
+    errorStadt: 'Bitte Stadt eingeben.',
+    errorLand: 'Bitte Land eingeben.',
+    paymentMsg: 'Bitte bezahle direkt vor Ort beim Ausstellungspersonal. Wir akzeptieren nur Barzahlung.'
   },
   en: {
     exhibition: 'Photo Exhibition · Berlin',
@@ -795,11 +850,26 @@ const T = {
     thanksHeadline: 'Thank you for<br>your order!',
     orderHint: 'Please note this number.',
     pickupMsg: "We'll send you an email as soon as your catalog is ready for pickup. We look forward to seeing you!",
-    shippingMsg: '<strong>Please leave your delivery address on-site.</strong> You\'ll find an address card with the exhibition staff. The €5 shipping fee will be charged separately.',
-    summaryName: 'Name', summaryEmail: 'Email', summaryQty: 'Copies', summaryDelivery: 'Delivery', summaryNewsletter: 'Newsletter',
+    shippingMsg: '',
+    summaryName: 'Name', summaryEmail: 'Email', summaryQty: 'Copies', summaryDelivery: 'Delivery', summaryNewsletter: 'Newsletter', summaryAddress: 'Delivery address',
     newsletterYes: 'Yes', newsletterNo: 'No', newsletterNone: '—',
     editLabel: 'Edit',
-    pickup: 'Self-pickup', shipping: 'Shipping (+€5)'
+    pickup: 'Self-pickup', shipping: 'Shipping (+€5)',
+    addressTitle: 'Delivery Address',
+    addressSub: 'Where should we send your catalog?',
+    labelStrasse: 'Street and house number',
+    labelPlz: 'Postcode',
+    labelStadt: 'City',
+    labelLand: 'Country',
+    placeholderStrasse: '1 Example Street',
+    placeholderPlz: '10115',
+    placeholderStadt: 'Berlin',
+    placeholderLand: 'Germany',
+    errorStrasse: 'Please enter your street.',
+    errorPlz: 'Please enter your postcode.',
+    errorStadt: 'Please enter your city.',
+    errorLand: 'Please enter your country.',
+    paymentMsg: 'Please pay on-site at the exhibition. Cash only.'
   }
 };
 
@@ -880,6 +950,7 @@ async function goTo(step) {
     const t = T[state.lang];
     document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
     document.getElementById('order-hint-text').textContent = t.orderHint;
+    document.getElementById('payment-notice-text').textContent = t.paymentMsg;
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
   }
@@ -964,28 +1035,91 @@ function editStep(step) {
   showScreen(step);
 }
 
-// ─── Submit order ──────────────────────────────────────
+function editAddress() {
+  updateAddressScreen();
+  showScreen(5);
+}
+
+// ─── Submit order (after delivery choice) ─────────────
 function submitOrder() {
   state.delivery = document.querySelector('input[name="delivery"]:checked').value;
-  const t = T[state.lang];
-  const summaryHTML = buildSummaryHTML(t);
 
-  if (state.delivery === 'pickup') {
-    document.getElementById('pickup-summary').innerHTML = summaryHTML;
-    document.getElementById('pickup-msg-text').innerHTML = t.pickupMsg;
-    showScreen('confirm-pickup');
+  if (state.delivery === 'shipping') {
+    // 住所入力画面へ（言語更新してから表示）
+    updateAddressScreen();
+    document.getElementById('progress-bar').style.display = 'none';
+    showScreen(5);
   } else {
-    document.getElementById('shipping-summary').innerHTML = summaryHTML;
-    document.getElementById('shipping-msg-text').innerHTML = t.shippingMsg;
-    showScreen('confirm-shipping');
+    // 自己取り → 直接確認画面へ
+    const t = T[state.lang];
+    document.getElementById('pickup-summary').innerHTML = buildSummaryHTML(t);
+    document.getElementById('pickup-msg-text').innerHTML = t.pickupMsg;
+    document.getElementById('progress-bar').style.display = 'none';
+    showScreen('confirm-pickup');
   }
-  document.getElementById('progress-bar').style.display = 'none';
+}
+
+// ─── Address screen language update ───────────────────
+function updateAddressScreen() {
+  const t = T[state.lang];
+  document.getElementById('addr-eyebrow').textContent = t.addressTitle;
+  document.getElementById('addr-title').textContent   = t.addressTitle;
+  document.getElementById('addr-sub').textContent     = t.addressSub;
+  document.getElementById('lbl-strasse').textContent  = t.labelStrasse;
+  document.getElementById('lbl-plz').textContent      = t.labelPlz;
+  document.getElementById('lbl-stadt').textContent    = t.labelStadt;
+  document.getElementById('lbl-land').textContent     = t.labelLand;
+  document.getElementById('strasse').placeholder      = t.placeholderStrasse;
+  document.getElementById('plz').placeholder          = t.placeholderPlz;
+  document.getElementById('stadt').placeholder        = t.placeholderStadt;
+  document.getElementById('land').placeholder         = t.placeholderLand;
+  document.getElementById('strasse-error').textContent = t.errorStrasse;
+  document.getElementById('plz-error').textContent    = t.errorPlz;
+  document.getElementById('stadt-error').textContent  = t.errorStadt;
+  document.getElementById('land-error').textContent   = t.errorLand;
+  document.getElementById('btn-addr').textContent     = state.lang === 'de' ? 'Weiter →' : 'Continue →';
+}
+
+// ─── Validate and go to shipping confirmation ──────────
+function goToConfirm() {
+  const t = T[state.lang];
+  let ok = true;
+  const fields = [
+    { id: 'strasse', errId: 'strasse-error', key: 'strasse' },
+    { id: 'plz',     errId: 'plz-error',     key: 'plz' },
+    { id: 'stadt',   errId: 'stadt-error',   key: 'stadt' },
+    { id: 'land',    errId: 'land-error',    key: 'land' },
+  ];
+  fields.forEach(f => {
+    const val = document.getElementById(f.id).value.trim();
+    if (!val) {
+      document.getElementById(f.id).classList.add('error');
+      document.getElementById(f.errId).classList.add('show');
+      ok = false;
+    } else {
+      document.getElementById(f.id).classList.remove('error');
+      document.getElementById(f.errId).classList.remove('show');
+      state[f.key] = val;
+    }
+  });
+  if (!ok) return;
+
+  document.getElementById('shipping-summary').innerHTML = buildSummaryHTML(t);
+  showScreen('confirm-shipping');
 }
 
 function buildSummaryHTML(t) {
   const deliveryLabel = state.delivery === 'pickup' ? t.pickup : t.shipping;
   const nlLabel = state.newsletter === true ? t.newsletterYes : state.newsletter === false ? t.newsletterNo : t.newsletterNone;
   const editLabel = t.editLabel;
+  const addressRow = state.delivery === 'shipping' && state.strasse ? `
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryAddress}</span>
+      <div class="confirm-right">
+        <span class="confirm-value">${state.strasse}, ${state.plz} ${state.stadt}, ${state.land}</span>
+        <button class="confirm-edit" onclick="editAddress()">${editLabel}</button>
+      </div>
+    </div>` : '';
   return `
     <div class="confirm-row">
       <span class="confirm-label">${t.summaryName}</span>
@@ -1015,6 +1149,7 @@ function buildSummaryHTML(t) {
         <button class="confirm-edit" onclick="editStep(4)">${editLabel}</button>
       </div>
     </div>
+    ${addressRow}
     <div class="confirm-row">
       <span class="confirm-label">${t.summaryNewsletter}</span>
       <div class="confirm-right">
@@ -1073,6 +1208,7 @@ async function submitToSheets() {
     stueck: state.qty,
     selbstabholung: state.delivery === 'pickup' ? 'Ja' : '',
     lieferung: state.delivery === 'shipping' ? 'Ja' : '',
+    adresse: state.delivery === 'shipping' ? `${state.strasse}, ${state.plz} ${state.stadt}, ${state.land}` : '',
     newsletter: state.newsletter === true ? 'Ja' : state.newsletter === false ? 'Nein' : '',
     bezahlung: '',
     datePrefix: datePrefix
