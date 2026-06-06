@@ -121,11 +121,11 @@
     margin: 1.25rem 0 0;
   }
   .payment-method-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--white-soft);
+    color: var(--orange);
     margin-bottom: 0.75rem;
     display: block;
   }
@@ -137,11 +137,11 @@
     flex: 1;
     padding: 13px;
     font-family: var(--font);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     border: 1.5px solid var(--border);
     background: var(--bg-input);
-    color: var(--white-soft);
+    color: var(--white-mid);
     cursor: pointer;
     transition: all 0.2s var(--ease);
     text-align: center;
@@ -175,10 +175,10 @@
     color: var(--white);
   }
   .total-breakdown {
-    font-size: 11px;
-    color: var(--white-soft);
+    font-size: 13px;
+    color: var(--white-mid);
     margin-top: 2px;
-    text-align: right;
+    text-align: left;
   }
 
   .header-rule {
@@ -1044,6 +1044,18 @@ function setLang(lang) {
     document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
     document.getElementById('order-hint-text').textContent = t.orderHint;
     renderThanksSummary();
+    // 支払いメッセージも言語に合わせて更新
+    const shipping = getShipping(state.qty, state.delivery);
+    const total = (CATALOG_PRICE * state.qty + shipping).toFixed(2).replace('.', ',');
+    const isDE = lang === 'de';
+    const paymentNotice = state.paymentMethod === 'paypal'
+      ? (isDE
+          ? `Bitte überweise ${total} € per PayPal an das Museum der Trostfrauen. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
+          : `Please transfer €${total} via PayPal to Museum der Trostfrauen. You will be redirected after closing this page.`)
+      : (isDE
+          ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal.`
+          : `Please pay €${total} on-site at the exhibition.`);
+    document.getElementById('payment-notice-text').textContent = paymentNotice;
   }
   // 確認画面が表示中の場合も再レンダリング
   const summaryHTML = state.email ? buildSummaryHTML(t) : null;
