@@ -105,6 +105,82 @@
   }
   .catalog-title span { color: var(--orange); }
 
+  .price-badge {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--orange);
+    border: 1.5px solid var(--orange);
+    padding: 3px 10px;
+    margin-top: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Payment method selector ────────────── */
+  .payment-method-wrap {
+    margin: 1.25rem 0 0;
+  }
+  .payment-method-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white-soft);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  .payment-btns {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .payment-btn {
+    flex: 1;
+    padding: 13px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    background: var(--bg-input);
+    color: var(--white-soft);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    text-align: center;
+  }
+  .payment-btn.selected {
+    border-color: var(--orange);
+    background: var(--orange-bg);
+    color: var(--orange);
+  }
+
+  /* ── Total price box ────────────────────── */
+  .total-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    margin: 1rem 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .total-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white-soft);
+  }
+  .total-amount {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--white);
+  }
+  .total-breakdown {
+    font-size: 11px;
+    color: var(--white-soft);
+    margin-top: 2px;
+    text-align: right;
+  }
+
   .header-rule {
     width: 100%;
     height: 1px;
@@ -640,6 +716,7 @@
     </div>
     <div class="logo-area">
       <h1 class="catalog-title" id="lbl-catalog-title"><span>K</span>ATALOG<br>VORBESTELLUNG</h1>
+      <div class="price-badge" id="lbl-price-badge">14 € / Stück</div>
       <div class="header-rule"></div>
     </div>
   </header>
@@ -800,6 +877,22 @@
         <span id="pickup-msg-text"></span>
       </div>
 
+      <div id="total-box-pickup" class="total-box">
+        <div>
+          <div class="total-label" data-de="Gesamtbetrag" data-en="Total">Gesamtbetrag</div>
+          <div class="total-breakdown" id="total-breakdown-pickup"></div>
+        </div>
+        <div class="total-amount" id="total-amount-pickup"></div>
+      </div>
+
+      <div class="payment-method-wrap">
+        <span class="payment-method-label" data-de="Zahlungsart wählen" data-en="Choose payment method">Zahlungsart wählen</span>
+        <div class="payment-btns">
+          <button class="payment-btn" id="pay-cash-pickup" onclick="selectPayment('pickup','cash')" data-de="Barzahlung" data-en="Cash">Barzahlung</button>
+          <button class="payment-btn" id="pay-paypal-pickup" onclick="selectPayment('pickup','paypal')">PayPal</button>
+        </div>
+      </div>
+
       <div class="gdpr-wrap">
         <input type="checkbox" class="gdpr-checkbox" id="gdpr-pickup" onchange="checkGdpr('pickup')">
         <label for="gdpr-pickup" class="gdpr-text" id="gdpr-text-pickup">Ich stimme zu, dass meine Daten (Name, E-Mail) ausschließlich zur Abwicklung meiner Katalogbestellung verwendet und danach gelöscht werden. Verantwortlich: Museum der Trostfrauen.</label>
@@ -814,6 +907,22 @@
       <h2 class="screen-title" data-de="Alles korrekt? Dann bitte bestätigen." data-en="All correct? Please confirm.">Alles korrekt? Dann bitte bestätigen.</h2>
 
       <div class="confirm-box" id="shipping-summary"></div>
+
+      <div id="total-box-shipping" class="total-box">
+        <div>
+          <div class="total-label" data-de="Gesamtbetrag" data-en="Total">Gesamtbetrag</div>
+          <div class="total-breakdown" id="total-breakdown-shipping"></div>
+        </div>
+        <div class="total-amount" id="total-amount-shipping"></div>
+      </div>
+
+      <div class="payment-method-wrap">
+        <span class="payment-method-label" data-de="Zahlungsart wählen" data-en="Choose payment method">Zahlungsart wählen</span>
+        <div class="payment-btns">
+          <button class="payment-btn" id="pay-cash-shipping" onclick="selectPayment('shipping','cash')" data-de="Barzahlung" data-en="Cash">Barzahlung</button>
+          <button class="payment-btn" id="pay-paypal-shipping" onclick="selectPayment('shipping','paypal')">PayPal</button>
+        </div>
+      </div>
 
       <div class="gdpr-wrap">
         <input type="checkbox" class="gdpr-checkbox" id="gdpr-shipping" onchange="checkGdpr('shipping')">
@@ -849,6 +958,7 @@ const state = {
   qty: 1, delivery: 'pickup',
   newsletter: null,
   strasse: '', plz: '', stadt: '', land: '',
+  paymentMethod: null,
   orderNumber: ''
 };
 
@@ -857,6 +967,7 @@ const T = {
   de: {
     exhibition: 'Fotoausstellung · Berlin',
     catalogTitle: '<span>K</span>ATALOG<br>VORBESTELLUNG',
+    priceBadge: '14 € / Stück',
     thanksHeadline: 'Vielen Dank für<br>deine Bestellung!',
     orderHint: 'Bitte notiere deine Nummer.',
     pickupMsg: 'Wir schicken dir eine E-Mail, sobald dein Katalog abholbereit ist. Wir freuen uns auf deinen Besuch!',
@@ -865,7 +976,7 @@ const T = {
     gdprShipping: 'Ich stimme zu, dass meine Daten (Name, E-Mail, Adresse) ausschließlich zur Abwicklung meiner Katalogbestellung verwendet und danach gelöscht werden. Verantwortlich: Museum der Trostfrauen.',
     newsletterYes: 'Ja', newsletterNo: 'Nein', newsletterNone: '—',
     editLabel: 'Ändern',
-    pickup: 'Selbstabholung', shipping: 'Versand (+5 €)',
+    pickup: 'Selbstabholung', shipping: 'Versand',
     addressTitle: 'Lieferadresse',
     addressSub: 'Wohin sollen wir deinen Katalog schicken?',
     labelStrasse: 'Straße und Hausnummer',
@@ -885,6 +996,7 @@ const T = {
   en: {
     exhibition: 'Photo Exhibition · Berlin',
     catalogTitle: '<span>C</span>ATALOG<br>PRE-ORDER',
+    priceBadge: '€14 / copy',
     thanksHeadline: 'Thank you for<br>your order!',
     orderHint: 'Please note this number.',
     pickupMsg: "We'll send you an email as soon as your catalog is ready for pickup. We look forward to seeing you!",
@@ -893,7 +1005,7 @@ const T = {
     gdprShipping: 'I agree that my data (name, email, address) will be used solely for processing my catalog order and deleted afterwards. Responsible: Museum der Trostfrauen.',
     newsletterYes: 'Yes', newsletterNo: 'No', newsletterNone: '—',
     editLabel: 'Edit',
-    pickup: 'Self-pickup', shipping: 'Shipping (+€5)',
+    pickup: 'Self-pickup', shipping: 'Shipping',
     addressTitle: 'Delivery Address',
     addressSub: 'Where should we send your catalog?',
     labelStrasse: 'Street and house number',
@@ -924,6 +1036,7 @@ function setLang(lang) {
   });
   const t = T[lang];
   document.getElementById('lbl-catalog-title').innerHTML = t.catalogTitle;
+  document.getElementById('lbl-price-badge').textContent = t.priceBadge;
   document.getElementById('gdpr-text-pickup').textContent = t.gdprPickup;
   document.getElementById('gdpr-text-shipping').textContent = t.gdprShipping;
   if (document.getElementById('screen-thanks').classList.contains('active')) {
@@ -991,9 +1104,25 @@ async function goTo(step) {
     const t = T[state.lang];
     document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
     document.getElementById('order-hint-text').textContent = t.orderHint;
-    document.getElementById('payment-notice-text').textContent = t.paymentMsg;
+
+    const shipping = getShipping(state.qty, state.delivery);
+    const total = (CATALOG_PRICE * state.qty + shipping).toFixed(2).replace('.', ',');
+    const isDE = state.lang === 'de';
+    const paymentNotice = state.paymentMethod === 'paypal'
+      ? (isDE
+          ? `Bitte überweise ${total} € per PayPal an das Museum der Trostfrauen. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
+          : `Please transfer €${total} via PayPal to Museum der Trostfrauen. You will be redirected after closing this page.`)
+      : (isDE
+          ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal. Wir akzeptieren nur Barzahlung.`
+          : `Please pay €${total} on-site at the exhibition. Cash only.`);
+    document.getElementById('payment-notice-text').textContent = paymentNotice;
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
+
+    // PayPal選択の場合、少し後にリダイレクト
+    if (state.paymentMethod === 'paypal' && PAYPAL_URL !== 'PAYPAL_LINK_HERE') {
+      setTimeout(() => { window.open(PAYPAL_URL, '_blank'); }, 2000);
+    }
   }
 }
 
@@ -1069,15 +1198,71 @@ function generateOrderNumber() {
   return prefix + seq;
 }
 
+// ─── Price calculation ─────────────────────────────────
+const CATALOG_PRICE = 14;
+
+function getShipping(qty, delivery) {
+  if (delivery === 'pickup') return 0;
+  if (qty === 1) return 4;
+  if (qty <= 3) return 5.5;
+  return 7;
+}
+
+function formatEur(amount) {
+  return amount.toFixed(2).replace('.', ',') + ' €';
+}
+
+function getShippingLabel(qty, delivery, lang) {
+  if (delivery === 'pickup') return lang === 'de' ? 'Abholung: kostenlos' : 'Pickup: free';
+  const rate = getShipping(qty, delivery);
+  if (lang === 'de') {
+    if (qty === 1) return `Versand (1 Stück): ${formatEur(rate)}`;
+    if (qty <= 3) return `Versand (2–3 Stück): ${formatEur(rate)}`;
+    return `Versand (4–7 Stück): ${formatEur(rate)}`;
+  } else {
+    if (qty === 1) return `Shipping (1 copy): ${formatEur(rate)}`;
+    if (qty <= 3) return `Shipping (2–3 copies): ${formatEur(rate)}`;
+    return `Shipping (4–7 copies): ${formatEur(rate)}`;
+  }
+}
+
+function renderTotal(type) {
+  const shipping  = getShipping(state.qty, state.delivery);
+  const katalog   = CATALOG_PRICE * state.qty;
+  const total     = katalog + shipping;
+  const lang      = state.lang;
+  const isDE      = lang === 'de';
+
+  const catalogLine = isDE
+    ? `${state.qty} × 14 €`
+    : `${state.qty} × €14`;
+  const shippingLine = getShippingLabel(state.qty, state.delivery, lang);
+  const breakdown = catalogLine + ' · ' + shippingLine;
+
+  document.getElementById('total-breakdown-' + type).textContent = breakdown;
+  document.getElementById('total-amount-' + type).textContent = formatEur(total);
+}
+
+// ─── Payment method selection ──────────────────────────
+const PAYPAL_URL = 'PAYPAL_LINK_HERE'; // PayPalリンクが確定したら差し替え
+
+function selectPayment(type, method) {
+  state.paymentMethod = method;
+  document.getElementById('pay-cash-' + type).classList.toggle('selected', method === 'cash');
+  document.getElementById('pay-paypal-' + type).classList.toggle('selected', method === 'paypal');
+  checkGdpr(type);
+}
+
 // ─── GDPR checkbox ─────────────────────────────────────
 function checkGdpr(type) {
   const checked = document.getElementById('gdpr-' + type).checked;
-  document.getElementById('btn-confirm-' + type).disabled = !checked;
+  const paid    = !!state.paymentMethod;
+  document.getElementById('btn-confirm-' + type).disabled = !(checked && paid);
 }
 
 // ─── Edit from confirmation ────────────────────────────
 function editStep(step) {
-  // 確認画面に戻るときGDPRチェックをリセット
+  state.paymentMethod = null;
   document.getElementById('gdpr-pickup').checked = false;
   document.getElementById('gdpr-shipping').checked = false;
   document.getElementById('btn-confirm-pickup').disabled = true;
@@ -1095,17 +1280,20 @@ function editAddress() {
 // ─── Submit order (after delivery choice) ─────────────
 function submitOrder() {
   state.delivery = document.querySelector('input[name="delivery"]:checked').value;
+  state.paymentMethod = null; // 支払い方法リセット
 
   if (state.delivery === 'shipping') {
-    // 住所入力画面へ（言語更新してから表示）
     updateAddressScreen();
     document.getElementById('progress-bar').style.display = 'none';
     showScreen(5);
   } else {
-    // 自己取り → 直接確認画面へ
     const t = T[state.lang];
     document.getElementById('pickup-summary').innerHTML = buildSummaryHTML(t);
     document.getElementById('pickup-msg-text').innerHTML = t.pickupMsg;
+    renderTotal('pickup');
+    // 支払いボタンリセット
+    document.getElementById('pay-cash-pickup').classList.remove('selected');
+    document.getElementById('pay-paypal-pickup').classList.remove('selected');
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('confirm-pickup');
   }
@@ -1157,6 +1345,10 @@ function goToConfirm() {
   if (!ok) return;
 
   document.getElementById('shipping-summary').innerHTML = buildSummaryHTML(t);
+  renderTotal('shipping');
+  // 支払いボタンリセット
+  document.getElementById('pay-cash-shipping').classList.remove('selected');
+  document.getElementById('pay-paypal-shipping').classList.remove('selected');
   showScreen('confirm-shipping');
 }
 
@@ -1268,7 +1460,7 @@ async function submitToSheets() {
     lieferung: state.delivery === 'shipping' ? 'Ja' : '',
     adresse: state.delivery === 'shipping' ? `${state.strasse}, ${state.plz} ${state.stadt}, ${state.land}` : '',
     newsletter: state.newsletter === true ? 'Ja' : state.newsletter === false ? 'Nein' : '',
-    bezahlung: '',
+    bezahlung: state.paymentMethod === 'cash' ? 'Barzahlung' : state.paymentMethod === 'paypal' ? 'PayPal' : '',
     bestellnummer: bestellnummer,
     datePrefix: datePrefix
   };
