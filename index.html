@@ -518,13 +518,13 @@
   }
   .confirm-row:last-child { border-bottom: none; }
   .confirm-label {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--white-soft);
+    color: var(--white-mid);
     flex-shrink: 0;
-    width: 90px;
+    width: 100px;
   }
   .confirm-value {
     font-weight: 500;
@@ -717,7 +717,6 @@
     <div class="logo-area">
       <h1 class="catalog-title" id="lbl-catalog-title"><span>K</span>ATALOG<br>VORBESTELLUNG</h1>
       <div class="price-badge" id="lbl-price-badge">14 € / Stück</div>
-      <div class="header-rule"></div>
     </div>
   </header>
 
@@ -1109,14 +1108,15 @@ async function goTo(step) {
 
     const shipping = getShipping(state.qty, state.delivery);
     const total = (CATALOG_PRICE * state.qty + shipping).toFixed(2).replace('.', ',');
-    const isDE = state.lang === 'de';
+    const isDE = document.querySelector('.lang-btn.active').textContent === 'DE';
+    state.lang = isDE ? 'de' : 'en';
     const paymentNotice = state.paymentMethod === 'paypal'
       ? (isDE
           ? `Bitte überweise ${total} € per PayPal an das Museum der Trostfrauen. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
           : `Please transfer €${total} via PayPal to Museum der Trostfrauen. You will be redirected after closing this page.`)
       : (isDE
-          ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal. Wir akzeptieren nur Barzahlung.`
-          : `Please pay €${total} on-site at the exhibition. Cash only.`);
+          ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal.`
+          : `Please pay €${total} on-site at the exhibition.`);
     document.getElementById('payment-notice-text').textContent = paymentNotice;
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
