@@ -1030,7 +1030,7 @@ function setLang(lang) {
       ? `Bitte bezahle ${total} € vor Ort beim Ausstellungspersonal.\nBarzahlung oder PayPal möglich.`
       : `Please pay €${total} on-site at the exhibition.\nCash or PayPal accepted.`;
     document.getElementById('payment-notice-text').innerHTML =
-      paymentNotice.replace('\n', '<br><br>') +
+      '<strong>' + paymentNotice.replace('\n', '</strong><br><br><strong>') + '</strong>' +
       `<br><br><a href="https://www.paypal.com/paypalme/koreaverband" target="_blank" style="color:var(--orange);text-decoration:underline;text-underline-offset:3px;">paypal.me/koreaverband</a>`;
   }
   // 確認画面が表示中の場合も再レンダリング
@@ -1098,7 +1098,7 @@ async function goTo(step) {
       ? `Bitte bezahle ${total} € vor Ort beim Ausstellungspersonal.\nBarzahlung oder PayPal möglich.`
       : `Please pay €${total} on-site at the exhibition.\nCash or PayPal accepted.`;
     document.getElementById('payment-notice-text').innerHTML =
-      paymentNotice.replace('\n', '<br><br>') +
+      '<strong>' + paymentNotice.replace('\n', '</strong><br><br><strong>') + '</strong>' +
       `<br><br><a href="https://www.paypal.com/paypalme/koreaverband" target="_blank" style="color:var(--orange);text-decoration:underline;text-underline-offset:3px;">paypal.me/koreaverband</a>`;
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
