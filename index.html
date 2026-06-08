@@ -936,12 +936,6 @@
       <div class="thank-icon">✦</div>
       <h2 class="screen-title" style="text-align:center; font-size:1.9rem;" id="thanks-headline">Vielen Dank für<br>deine Bestellung!</h2>
 
-      <div class="order-number-box">
-        <div class="order-label" data-de="Deine Bestellnummer" data-en="Your order number">Deine Bestellnummer</div>
-        <div class="order-number" id="order-number-display">1405001</div>
-        <div class="order-hint" id="order-hint-text"></div>
-      </div>
-
       <div class="payment-notice" id="payment-notice-text"></div>
 
       <div class="confirm-box" id="thanks-summary"></div>
@@ -1102,21 +1096,17 @@ async function goTo(step) {
     updateProgress(4);
     showScreen(4);
   } else if (step === 'thanks') {
-    // ボタンをローディング状態に
     const confirmBtns = document.querySelectorAll('#screen-confirm-pickup .btn-primary, #screen-confirm-shipping .btn-primary');
     confirmBtns.forEach(btn => {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>' + (state.lang === 'de' ? 'Wird gesendet…' : 'Sending…');
     });
 
-    const orderNumber = await submitToSheets();
-    state.orderNumber = orderNumber;
+    await submitToSheets();
 
     renderThanksSummary();
-    document.getElementById('order-number-display').textContent = state.orderNumber;
     const t = T[state.lang];
     document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
-    document.getElementById('order-hint-text').textContent = t.orderHint;
 
     const shipping = getShipping(state.qty, state.delivery);
     const total = (CATALOG_PRICE * state.qty + shipping).toFixed(2).replace('.', ',');
@@ -1133,9 +1123,11 @@ async function goTo(step) {
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
 
-    // PayPal選択の場合、少し後にリダイレクト
     if (state.paymentMethod === 'paypal' && PAYPAL_URL !== 'PAYPAL_LINK_HERE') {
-      setTimeout(() => { window.open(PAYPAL_URL, '_blank'); }, 2000);
+      setTimeout(() => {
+        window.location.href = PAYPAL_APP_URL;
+        setTimeout(() => { window.open(PAYPAL_URL, '_blank'); }, 1500);
+      }, 2000);
     }
   }
 }
@@ -1259,6 +1251,7 @@ function renderTotal(type) {
 
 // ─── Payment method selection ──────────────────────────
 const PAYPAL_URL = 'https://www.paypal.com/paypalme/koreaverband';
+const PAYPAL_APP_URL = 'paypal://paypalme/koreaverband';
 
 function selectPayment(type, method) {
   state.paymentMethod = method;
@@ -1459,12 +1452,6 @@ async function submitToSheets() {
   const dd = String(now.getDate()).padStart(2, '0');
   const datePrefix = mm + dd;
 
-  // 注文番号をローカルで生成
-  let counter = parseInt(localStorage.getItem('order_counter_total') || '0');
-  counter++;
-  localStorage.setItem('order_counter_total', String(counter));
-  const bestellnummer = datePrefix + String(counter).padStart(3, '0');
-
   const payload = {
     name: state.name,
     vorname: state.vorname,
@@ -1475,7 +1462,6 @@ async function submitToSheets() {
     adresse: state.delivery === 'shipping' ? `${state.strasse}, ${state.plz} ${state.stadt}, ${state.land}` : '',
     newsletter: state.newsletter === true ? 'Ja' : state.newsletter === false ? 'Nein' : '',
     bezahlung: state.paymentMethod === 'cash' ? 'Barzahlung' : state.paymentMethod === 'paypal' ? 'PayPal' : '',
-    bestellnummer: bestellnummer,
     datePrefix: datePrefix
   };
 
@@ -1492,7 +1478,6 @@ async function submitToSheets() {
     form.target = 'hidden-submit';
     form.style.display = 'none';
 
-    // JSONをひとつのフィールドで送る
     const input = document.createElement('input');
     input.type = 'hidden';
     input.name = 'data';
@@ -1502,7 +1487,6 @@ async function submitToSheets() {
     document.body.appendChild(form);
     form.submit();
 
-    // 送信後にクリーンアップ
     setTimeout(() => {
       document.body.removeChild(form);
       document.body.removeChild(iframe);
@@ -1510,8 +1494,6 @@ async function submitToSheets() {
   } catch(e) {
     console.warn('Sheets send failed:', e);
   }
-
-  return bestellnummer;
 }
 
 // ─── Init: リアルタイム入力チェック ───────────────────
