@@ -1225,13 +1225,6 @@ function renderTotal(type) {
 // ─── Payment method selection ──────────────────────────
 const PAYPAL_URL = 'https://www.paypal.com/paypalme/koreaverband';
 
-function selectPayment(type, method) {
-  state.paymentMethod = method;
-  document.getElementById('pay-cash-' + type).classList.toggle('selected', method === 'cash');
-  document.getElementById('pay-paypal-' + type).classList.toggle('selected', method === 'paypal');
-  checkGdpr(type);
-}
-
 // ─── GDPR checkbox ─────────────────────────────────────
 function checkGdpr(type) {
   const checked = document.getElementById('gdpr-' + type).checked;
@@ -1240,7 +1233,6 @@ function checkGdpr(type) {
 
 // ─── Edit from confirmation ────────────────────────────
 function editStep(step) {
-  state.paymentMethod = null;
   document.getElementById('gdpr-pickup').checked = false;
   document.getElementById('gdpr-shipping').checked = false;
   document.getElementById('btn-confirm-pickup').disabled = true;
@@ -1258,7 +1250,6 @@ function editAddress() {
 // ─── Submit order (after delivery choice) ─────────────
 function submitOrder() {
   state.delivery = document.querySelector('input[name="delivery"]:checked').value;
-  state.paymentMethod = null; // 支払い方法リセット
 
   if (state.delivery === 'shipping') {
     updateAddressScreen();
@@ -1269,9 +1260,6 @@ function submitOrder() {
     document.getElementById('pickup-summary').innerHTML = buildSummaryHTML(t);
     document.getElementById('pickup-msg-text').innerHTML = t.pickupMsg;
     renderTotal('pickup');
-    // 支払いボタンリセット
-    document.getElementById('pay-cash-pickup').classList.remove('selected');
-    document.getElementById('pay-paypal-pickup').classList.remove('selected');
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('confirm-pickup');
   }
@@ -1324,9 +1312,6 @@ function goToConfirm() {
 
   document.getElementById('shipping-summary').innerHTML = buildSummaryHTML(t);
   renderTotal('shipping');
-  // 支払いボタンリセット
-  document.getElementById('pay-cash-shipping').classList.remove('selected');
-  document.getElementById('pay-paypal-shipping').classList.remove('selected');
   showScreen('confirm-shipping');
 }
 
