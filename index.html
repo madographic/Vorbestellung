@@ -884,14 +884,6 @@
         <div class="total-amount" id="total-amount-pickup"></div>
       </div>
 
-      <div class="payment-method-wrap">
-        <span class="payment-method-label" data-de="Zahlungsart wählen" data-en="Choose payment method">Zahlungsart wählen</span>
-        <div class="payment-btns">
-          <button class="payment-btn" id="pay-cash-pickup" onclick="selectPayment('pickup','cash')" data-de="Barzahlung" data-en="Cash">Barzahlung</button>
-          <button class="payment-btn" id="pay-paypal-pickup" onclick="selectPayment('pickup','paypal')">PayPal</button>
-        </div>
-      </div>
-
       <div class="gdpr-wrap">
         <input type="checkbox" class="gdpr-checkbox" id="gdpr-pickup" onchange="checkGdpr('pickup')">
         <label for="gdpr-pickup" class="gdpr-text" id="gdpr-text-pickup">Ich stimme zu, dass meine Daten (Name, E-Mail) ausschließlich zur Abwicklung meiner Katalogbestellung verwendet und danach gelöscht werden. Verantwortlich: Museum der Trostfrauen.</label>
@@ -913,14 +905,6 @@
           <div class="total-breakdown" id="total-breakdown-shipping"></div>
         </div>
         <div class="total-amount" id="total-amount-shipping"></div>
-      </div>
-
-      <div class="payment-method-wrap">
-        <span class="payment-method-label" data-de="Zahlungsart wählen" data-en="Choose payment method">Zahlungsart wählen</span>
-        <div class="payment-btns">
-          <button class="payment-btn" id="pay-cash-shipping" onclick="selectPayment('shipping','cash')" data-de="Barzahlung" data-en="Cash">Barzahlung</button>
-          <button class="payment-btn" id="pay-paypal-shipping" onclick="selectPayment('shipping','paypal')">PayPal</button>
-        </div>
       </div>
 
       <div class="gdpr-wrap">
@@ -1042,14 +1026,12 @@ function setLang(lang) {
     const shipping = getShipping(state.qty, state.delivery);
     const total = (CATALOG_PRICE * state.qty + shipping).toFixed(2).replace('.', ',');
     const isDE = lang === 'de';
-    const paymentNotice = state.paymentMethod === 'paypal'
-      ? (isDE
-          ? `Bitte überweise ${total} € per PayPal an das Korea Verband. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
-          : `Please transfer €${total} via PayPal to Korea Verband. You will be redirected after closing this page.`)
-      : (isDE
-          ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal.`
-          : `Please pay €${total} on-site at the exhibition.`);
-    document.getElementById('payment-notice-text').textContent = paymentNotice;
+    const paymentNotice = isDE
+      ? `Bitte bezahle ${total} € vor Ort beim Ausstellungspersonal.\nBarzahlung oder PayPal möglich.`
+      : `Please pay €${total} on-site at the exhibition.\nCash or PayPal accepted.`;
+    document.getElementById('payment-notice-text').innerHTML =
+      paymentNotice.replace('\n', '<br><br>') +
+      `<br><br><a href="https://www.paypal.com/paypalme/koreaverband" target="_blank" style="color:var(--orange);text-decoration:underline;text-underline-offset:3px;">paypal.me/koreaverband</a>`;
   }
   // 確認画面が表示中の場合も再レンダリング
   const summaryHTML = state.email ? buildSummaryHTML(t) : null;
@@ -1112,20 +1094,14 @@ async function goTo(step) {
     const total = (CATALOG_PRICE * state.qty + shipping).toFixed(2).replace('.', ',');
     const isDE = document.querySelector('.lang-btn.active').textContent === 'DE';
     state.lang = isDE ? 'de' : 'en';
-    const paymentNotice = state.paymentMethod === 'paypal'
-      ? (isDE
-          ? `Bitte überweise ${total} € per PayPal an das Korea Verband. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
-          : `Please transfer €${total} via PayPal to Korea Verband. You will be redirected after closing this page.`)
-      : (isDE
-          ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal.`
-          : `Please pay €${total} on-site at the exhibition.`);
-    document.getElementById('payment-notice-text').textContent = paymentNotice;
+    const paymentNotice = isDE
+      ? `Bitte bezahle ${total} € vor Ort beim Ausstellungspersonal.\nBarzahlung oder PayPal möglich.`
+      : `Please pay €${total} on-site at the exhibition.\nCash or PayPal accepted.`;
+    document.getElementById('payment-notice-text').innerHTML =
+      paymentNotice.replace('\n', '<br><br>') +
+      `<br><br><a href="https://www.paypal.com/paypalme/koreaverband" target="_blank" style="color:var(--orange);text-decoration:underline;text-underline-offset:3px;">paypal.me/koreaverband</a>`;
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
-
-    if (state.paymentMethod === 'paypal') {
-      setTimeout(() => { window.open(PAYPAL_URL, '_blank'); }, 2000);
-    }
   }
 }
 
@@ -1259,8 +1235,7 @@ function selectPayment(type, method) {
 // ─── GDPR checkbox ─────────────────────────────────────
 function checkGdpr(type) {
   const checked = document.getElementById('gdpr-' + type).checked;
-  const paid    = !!state.paymentMethod;
-  document.getElementById('btn-confirm-' + type).disabled = !(checked && paid);
+  document.getElementById('btn-confirm-' + type).disabled = !checked;
 }
 
 // ─── Edit from confirmation ────────────────────────────
