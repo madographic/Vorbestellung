@@ -1123,11 +1123,8 @@ async function goTo(step) {
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
 
-    if (state.paymentMethod === 'paypal' && PAYPAL_URL !== 'PAYPAL_LINK_HERE') {
-      setTimeout(() => {
-        window.location.href = PAYPAL_APP_URL;
-        setTimeout(() => { window.open(PAYPAL_URL, '_blank'); }, 1500);
-      }, 2000);
+    if (state.paymentMethod === 'paypal') {
+      setTimeout(() => { window.open(PAYPAL_URL, '_blank'); }, 2000);
     }
   }
 }
@@ -1251,7 +1248,6 @@ function renderTotal(type) {
 
 // ─── Payment method selection ──────────────────────────
 const PAYPAL_URL = 'https://www.paypal.com/paypalme/koreaverband';
-const PAYPAL_APP_URL = 'paypal://paypalme/koreaverband';
 
 function selectPayment(type, method) {
   state.paymentMethod = method;
