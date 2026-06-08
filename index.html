@@ -1044,8 +1044,8 @@ function setLang(lang) {
     const isDE = lang === 'de';
     const paymentNotice = state.paymentMethod === 'paypal'
       ? (isDE
-          ? `Bitte überweise ${total} € per PayPal an das Museum der Trostfrauen. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
-          : `Please transfer €${total} via PayPal to Museum der Trostfrauen. You will be redirected after closing this page.`)
+          ? `Bitte überweise ${total} € per PayPal an das Korea Verband. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
+          : `Please transfer €${total} via PayPal to Korea Verband. You will be redirected after closing this page.`)
       : (isDE
           ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal.`
           : `Please pay €${total} on-site at the exhibition.`);
@@ -1114,8 +1114,8 @@ async function goTo(step) {
     state.lang = isDE ? 'de' : 'en';
     const paymentNotice = state.paymentMethod === 'paypal'
       ? (isDE
-          ? `Bitte überweise ${total} € per PayPal an das Museum der Trostfrauen. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
-          : `Please transfer €${total} via PayPal to Museum der Trostfrauen. You will be redirected after closing this page.`)
+          ? `Bitte überweise ${total} € per PayPal an das Korea Verband. Du wirst nach dem Schließen dieser Seite weitergeleitet.`
+          : `Please transfer €${total} via PayPal to Korea Verband. You will be redirected after closing this page.`)
       : (isDE
           ? `Bitte bezahle ${total} € direkt vor Ort beim Ausstellungspersonal.`
           : `Please pay €${total} on-site at the exhibition.`);
