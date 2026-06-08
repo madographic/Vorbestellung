@@ -1020,7 +1020,6 @@ function setLang(lang) {
   document.getElementById('gdpr-text-shipping').textContent = t.gdprShipping;
   if (document.getElementById('screen-thanks').classList.contains('active')) {
     document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
-    document.getElementById('order-hint-text').textContent = t.orderHint;
     renderThanksSummary();
     // 支払いメッセージも言語に合わせて更新
     const shipping = getShipping(state.qty, state.delivery);
