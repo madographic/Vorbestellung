@@ -1407,6 +1407,10 @@ async function submitToSheets() {
   const dd = String(now.getDate()).padStart(2, '0');
   const datePrefix = mm + dd;
 
+  // 合計金額を計算
+  const shippingCost = getShipping(state.qty, state.delivery);
+  const totalAmount = (CATALOG_PRICE * state.qty + shippingCost).toFixed(2).replace('.', ',') + ' €';
+
   const payload = {
     name: state.name,
     vorname: state.vorname,
@@ -1416,7 +1420,7 @@ async function submitToSheets() {
     lieferung: state.delivery === 'shipping' ? 'Ja' : '',
     adresse: state.delivery === 'shipping' ? `${state.strasse}, ${state.plz} ${state.stadt}, ${state.land}` : '',
     newsletter: state.newsletter === true ? 'Ja' : state.newsletter === false ? 'Nein' : '',
-    bezahlung: state.paymentMethod === 'cash' ? 'Barzahlung' : state.paymentMethod === 'paypal' ? 'PayPal' : '',
+    bezahlung: totalAmount,
     datePrefix: datePrefix
   };
 
